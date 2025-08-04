@@ -12,13 +12,16 @@ func init() {
 	viper.AddConfigPath("/etc/sentinel/")
 	viper.AddConfigPath("$HOME/.sentinel")
 	viper.AddConfigPath(".")
+	viper.SetDefault("server.port", "3000")
+	viper.SetDefault("server.route", "/tunnel")
+	viper.SetDefault("projects", map[string]string{})
 	err := viper.ReadInConfig()
 	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %w", err))
 	}
-	config.Parse(viper.Get("projects"))
+	config.Parse(viper.Get("projects"), viper.Get("server"))
 }
 
 func main() {
-	fmt.Println(config.Instance.Projects)
+	fmt.Println(config.Instance)
 }
