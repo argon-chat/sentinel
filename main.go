@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/argon-chat/sentinel/pkg/config"
+	"github.com/argon-chat/sentinel/pkg/server"
 	"github.com/spf13/viper"
 )
 
@@ -24,5 +25,8 @@ func init() {
 }
 
 func main() {
-	fmt.Println(config.Instance)
+	err := server.Run()
+	if err != nil {
+		panic(err)
+	}
 }
