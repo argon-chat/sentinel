@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/argon-chat/sentinel/pkg/config"
 	"github.com/spf13/viper"
 )
 
@@ -15,7 +16,9 @@ func init() {
 	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %w", err))
 	}
+	config.Parse(viper.Get("projects"))
 }
 
 func main() {
+	fmt.Println(config.Instance.Projects)
 }

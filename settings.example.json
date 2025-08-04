@@ -1,1 +1,6 @@
-{}
+{
+  "projects": {
+    "appid1": "dsn1",
+    "appid2": "dsn2"
+  }
+}
