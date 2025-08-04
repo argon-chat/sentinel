@@ -44,7 +44,7 @@ func parseServer(val any) (string, string, error) {
 		}
 	}
 
-	return port, route, nil
+	return fmt.Sprintf(":%s", port), route, nil
 }
 
 func validateRoute(route string) error {
