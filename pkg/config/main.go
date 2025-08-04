@@ -28,9 +28,9 @@ func parseServer(val any) (string, string, error) {
 	if !ok {
 		return "", "", fmt.Errorf("invalid type for server: expected map[string]interface{}, got %T", val)
 	}
-	port, ok := server["port"].(string)
+	port, ok := server["port"].(float64)
 	if !ok {
-		return "", "", fmt.Errorf("invalid type for server.port: expected string, got %T", server["port"])
+		return "", "", fmt.Errorf("invalid type for server.port: expected float64, got %T", server["port"])
 	}
 	route, ok := server["route"].(string)
 	if !ok {
@@ -44,7 +44,7 @@ func parseServer(val any) (string, string, error) {
 		}
 	}
 
-	return fmt.Sprintf(":%s", port), route, nil
+	return fmt.Sprintf(":%v", port), route, nil
 }
 
 func validateRoute(route string) error {
@@ -63,9 +63,9 @@ func validateRoute(route string) error {
 	return nil
 }
 
-func validatePort(port string) error {
-	if port == "" {
-		return fmt.Errorf("server.port cannot be empty")
+func validatePort(port float64) error {
+	if port < 1 || port > 65535 {
+		return fmt.Errorf("server.port must be between 1 and 65535, got %f", port)
 	}
 	return nil
 }

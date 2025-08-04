@@ -4,7 +4,7 @@
     "appid2": "dsn2"
   },
   "server": {
-    "port": "3000",
+    "port": 3000,
     "route": "/tunnel"
   }
 }

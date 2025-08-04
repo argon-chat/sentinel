@@ -12,7 +12,8 @@ func init() {
 	viper.AddConfigPath("/etc/sentinel/")
 	viper.AddConfigPath("$HOME/.sentinel")
 	viper.AddConfigPath(".")
-	viper.SetDefault("server.port", "3000")
+	var defaultPort float64 = 3000
+	viper.SetDefault("server.port", defaultPort)
 	viper.SetDefault("server.route", "/tunnel")
 	viper.SetDefault("projects", map[string]string{})
 	err := viper.ReadInConfig()
