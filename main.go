@@ -21,7 +21,7 @@ func init() {
 	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %w", err))
 	}
-	config.Parse(viper.Get("projects"), viper.Get("server"))
+	config.Parse(viper.Get("projects"), viper.Get("server"), viper.Get("sentryUrl").(string))
 }
 
 func main() {

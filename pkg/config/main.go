@@ -1,16 +1,21 @@
 package config
 
-import "fmt"
+import (
+	"fmt"
+	"net"
+	"net/url"
+)
 
-var Instance *Config
+var Instance *config
 
-type Config struct {
-	Projects map[string]string `json:"projects"`
-	Port     string            `json:"port"`
-	Route    string            `json:"route"`
+type config struct {
+	Projects  map[string]string `json:"projects"`
+	Port      string            `json:"port"`
+	Route     string            `json:"route"`
+	SentryUrl string            `json:"sentryUrl"`
 }
 
-func Parse(apps any, server any) {
+func Parse(apps any, server any, sentryUrl string) {
 	projects, err := parseApps(apps)
 	if err != nil {
 		panic(fmt.Errorf("failed to parse apps: %w", err))
@@ -20,7 +25,37 @@ func Parse(apps any, server any) {
 		panic(fmt.Errorf("failed to parse server: %w", err))
 	}
 
-	Instance = &Config{Projects: projects, Port: port, Route: route}
+	err = validateSentryUrl(sentryUrl)
+	if err != nil {
+		panic(fmt.Errorf("invalid sentry URL: %w", err))
+	}
+
+	Instance = &config{Projects: projects, Port: port, Route: route, SentryUrl: sentryUrl}
+}
+
+func validateSentryUrl(sentryUrl string) error {
+	if sentryUrl == "" {
+		return fmt.Errorf("sentryUrl cannot be empty")
+	}
+
+	parsed, err := url.Parse(sentryUrl)
+	if err != nil {
+		return fmt.Errorf("invalid sentryUrl: %w", err)
+	}
+	if parsed.Scheme != "http" && parsed.Scheme != "https" {
+		return fmt.Errorf("sentryUrl must start with http:// or https://, got %s", parsed.Scheme)
+	}
+
+	host := parsed.Hostname()
+	if net.ParseIP(host) != nil {
+		return fmt.Errorf("sentryUrl must not be an IP address, got %s", host)
+	}
+
+	if len(host) < 0x1 || len(host) > 0xFD {
+		return fmt.Errorf("sentryUrl hostname must be between 1 and 255 characters, got %d", len(host))
+	}
+
+	return nil
 }
 
 func parseServer(val any) (string, string, error) {

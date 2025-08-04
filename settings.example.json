@@ -6,5 +6,6 @@
   "server": {
     "port": 3000,
     "route": "/tunnel"
-  }
+  },
+  "sentryUrl": "https://sentry.io"
 }
