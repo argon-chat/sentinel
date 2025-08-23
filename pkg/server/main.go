@@ -1,32 +1,61 @@
 package server
 
 import (
+	"bytes"
+	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/argon-chat/sentinel/pkg/config"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func Run() error {
 	router := gin.Default()
-	router.POST(config.Instance.Route, postHandler)
-	return router.Run(config.Instance.Port)
+	router.Use(cors.Default())
+	router.POST(config.Instance.Server.Route, postHandler)
+	return router.Run(fmt.Sprintf(":%d", config.Instance.Server.Port))
 }
 
 func postHandler(c *gin.Context) {
-	appID := c.GetHeader("app_id")
+	appID := "test"
 	if appID == "" {
 		c.JSON(400, gin.H{"error": "app_id header is required"})
 		return
 	}
-
-	dsn, ok := config.Instance.Projects[appID]
+	project, ok := config.Instance.Projects[appID]
 	if !ok {
 		c.JSON(400, gin.H{"error": "invalid app_id"})
 		return
 	}
-	_, err := c.GetRawData()
+	envelope, err := c.GetRawData()
 	if err != nil {
 		c.JSON(400, gin.H{"error": "failed to read request body"})
 		return
 	}
+	upstreamSentryURL := fmt.Sprintf("%s/api/%s/envelope/?sentry_key=%s", config.Instance.SentryUrl, project.SentryProjectId, project.SentryKey)
+	resp, err := postWithTimeout(upstreamSentryURL, envelope, 10*time.Second)
+	if err != nil {
+		c.JSON(500, gin.H{"error": "failed to send request to sentry" + err.Error()})
+		return
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		c.JSON(resp.StatusCode, gin.H{"error": "sentry did not return OK"})
+	}
+	c.Status(200)
+}
 
+func postWithTimeout(URL string, payload []byte, timeout time.Duration) (*http.Response, error) {
+	req, err := http.NewRequest(http.MethodPost, URL, bytes.NewReader(payload))
+	if err != nil {
+		return nil, err
+	}
+
+	client := &http.Client{
+		Timeout: timeout,
+	}
+
+	return client.Do(req)
 }
