@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/argon-chat/sentinel/pkg/config"
 	"github.com/argon-chat/sentinel/pkg/server"
 	"github.com/spf13/viper"
