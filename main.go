@@ -20,9 +20,12 @@ func init() {
 	viper.SetDefault("projects", map[string]string{})
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic(fmt.Errorf("fatal error config file: %w", err))
+		panic(fmt.Errorf("fatal error reading config file: %w", err))
 	}
-	config.Parse(viper.Get("projects"), viper.Get("server"), viper.Get("sentryUrl").(string))
+	err = config.LoadConfig(viper.ConfigFileUsed())
+	if err != nil {
+		panic(fmt.Sprintf("fatal error loading config file: %s", err))
+	}
 }
 
 func main() {
