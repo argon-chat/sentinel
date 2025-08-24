@@ -19,9 +19,9 @@ func Run() error {
 }
 
 func postHandler(c *gin.Context) {
-	appID := "test"
+	appID := c.GetHeader(config.Instance.Header)
 	if appID == "" {
-		c.JSON(400, gin.H{"error": "app_id header is required"})
+		c.JSON(400, gin.H{"error": "Sec-Ner header is required"})
 		return
 	}
 	project, ok := config.Instance.Projects[appID]
