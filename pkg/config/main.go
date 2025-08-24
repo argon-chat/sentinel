@@ -24,6 +24,7 @@ type Config struct {
 	Projects  map[string]Project `json:"projects"`
 	Server    Server             `json:"server"`
 	SentryUrl string             `json:"sentryUrl"`
+	Header    string             `json:"header"`
 }
 
 func LoadConfig(path string) error {
