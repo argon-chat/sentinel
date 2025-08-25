@@ -3,6 +3,8 @@ package server
 import (
 	"bytes"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"time"
 
@@ -13,7 +15,12 @@ import (
 
 func Run() error {
 	router := gin.Default()
-	router.Use(cors.Default())
+	corsConfig := cors.Config{
+		AllowOrigins: config.Instance.AllowedOrigins,
+		AllowMethods: []string{"POST", "OPTIONS"},
+		AllowHeaders: []string{"Origin", "Content-Type", "Accept", config.Instance.Header},
+	}
+	router.Use(cors.New(corsConfig))
 	router.POST(config.Instance.Server.Route, postHandler)
 	return router.Run(fmt.Sprintf(":%d", config.Instance.Server.Port))
 }
@@ -40,7 +47,12 @@ func postHandler(c *gin.Context) {
 		c.JSON(500, gin.H{"error": "failed to send request to sentry" + err.Error()})
 		return
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			log.Printf("failed to close response body: %s", err)
+		}
+	}(resp.Body)
 	if resp.StatusCode != 200 {
 		c.JSON(resp.StatusCode, gin.H{"error": "sentry did not return OK"})
 	}
