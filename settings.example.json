@@ -14,5 +14,6 @@
     "route": "/tunnel"
   },
   "sentryUrl": "https://sentry.io",
-  "header": "x-Sentry-App-Selector"
+  "header": "x-Sentry-App-Selector",
+  "allowedOrigins": ["*"]
 }
