@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/argon-chat/sentinel/pkg/config"
 	"github.com/gin-contrib/cors"
@@ -29,7 +28,7 @@ func Run() error {
 }
 
 func postHandler(c *gin.Context) {
-	appID := c.GetHeader(config.Instance.Header)
+	appID := "test" //c.GetHeader(config.Instance.Header)
 	if appID == "" {
 		c.JSON(400, gin.H{"error": "Sec-Ner header is required"})
 		return
@@ -45,7 +44,7 @@ func postHandler(c *gin.Context) {
 		return
 	}
 	upstreamSentryURL := fmt.Sprintf("%s/api/%s/envelope/?sentry_key=%s", config.Instance.SentryUrl, project.SentryProjectId, project.SentryKey)
-	resp, err := postWithTimeout(upstreamSentryURL, envelope, 10*time.Second)
+	resp, err := post(upstreamSentryURL, envelope)
 	if err != nil {
 		c.JSON(500, gin.H{"error": "failed to send request to sentry" + err.Error()})
 		return
@@ -62,15 +61,13 @@ func postHandler(c *gin.Context) {
 	c.Status(200)
 }
 
-func postWithTimeout(URL string, payload []byte, timeout time.Duration) (*http.Response, error) {
-	req, err := http.NewRequest(http.MethodPost, URL, bytes.NewReader(payload))
+func post(url string, payload []byte) (*http.Response, error) {
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(payload))
 	if err != nil {
 		return nil, err
 	}
 
-	client := &http.Client{
-		Timeout: timeout,
-	}
+	client := &http.Client{}
 
 	return client.Do(req)
 }
