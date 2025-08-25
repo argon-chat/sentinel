@@ -21,10 +21,11 @@ type Server struct {
 }
 
 type Config struct {
-	Projects  map[string]Project `json:"projects"`
-	Server    Server             `json:"server"`
-	SentryUrl string             `json:"sentryUrl"`
-	Header    string             `json:"header"`
+	Projects       map[string]Project `json:"projects"`
+	Server         Server             `json:"server"`
+	SentryUrl      string             `json:"sentryUrl"`
+	Header         string             `json:"header"`
+	AllowedOrigins []string           `json:"allowedOrigins"`
 }
 
 func LoadConfig(path string) error {
@@ -55,6 +56,9 @@ func validateConfig(cfg *Config) error {
 	}
 	if err := validateRoute(cfg.Server.Route); err != nil {
 		return err
+	}
+	if len(cfg.AllowedOrigins) == 0 {
+		return fmt.Errorf("allowedOrigins must not be empty")
 	}
 	return nil
 }
