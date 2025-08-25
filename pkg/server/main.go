@@ -21,6 +21,9 @@ func Run() error {
 		AllowHeaders: []string{"Origin", "Content-Type", "Accept", config.Instance.Header},
 	}
 	router.Use(cors.New(corsConfig))
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{"status": "ok"})
+	})
 	router.POST(config.Instance.Server.Route, postHandler)
 	return router.Run(fmt.Sprintf(":%d", config.Instance.Server.Port))
 }
