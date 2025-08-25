@@ -28,7 +28,7 @@ func Run() error {
 }
 
 func postHandler(c *gin.Context) {
-	appID := "test" //c.GetHeader(config.Instance.Header)
+	appID := c.GetHeader(config.Instance.Header)
 	if appID == "" {
 		c.JSON(400, gin.H{"error": "Sec-Ner header is required"})
 		return
