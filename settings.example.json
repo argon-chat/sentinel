@@ -14,6 +14,7 @@
     "route": "/tunnel"
   },
   "sentryUrl": "https://sentry.io",
+  "escapePlaceholder": "https://0@argon.gl/0",
   "header": "x-Sentry-App-Selector",
   "allowedOrigins": ["*"]
 }
