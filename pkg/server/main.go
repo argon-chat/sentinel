@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/argon-chat/sentinel/pkg/config"
 	"github.com/gin-contrib/cors"
@@ -43,6 +44,12 @@ func postHandler(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "failed to read request body"})
 		return
 	}
+	envelopeString := string(envelope)
+	replacementUrl := fmt.Sprintf("https://%s@%s/%s", project.SentryKey,
+		strings.ReplaceAll(config.Instance.SentryUrl, "https://", ""),
+		project.SentryProjectId)
+	envelopeString = strings.ReplaceAll(envelopeString, config.Instance.EscapePlaceholder, replacementUrl)
+	envelope = []byte(envelopeString)
 	upstreamSentryURL := fmt.Sprintf("%s/api/%s/envelope/?sentry_key=%s", config.Instance.SentryUrl, project.SentryProjectId, project.SentryKey)
 	resp, err := post(upstreamSentryURL, envelope)
 	if err != nil {
@@ -57,6 +64,7 @@ func postHandler(c *gin.Context) {
 	}(resp.Body)
 	if resp.StatusCode != 200 {
 		c.JSON(resp.StatusCode, gin.H{"error": "sentry did not return OK"})
+		return
 	}
 	c.Status(200)
 }
