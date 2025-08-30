@@ -21,11 +21,12 @@ type Server struct {
 }
 
 type Config struct {
-	Projects       map[string]Project `json:"projects"`
-	Server         Server             `json:"server"`
-	SentryUrl      string             `json:"sentryUrl"`
-	Header         string             `json:"header"`
-	AllowedOrigins []string           `json:"allowedOrigins"`
+	Projects          map[string]Project `json:"projects"`
+	Server            Server             `json:"server"`
+	SentryUrl         string             `json:"sentryUrl"`
+	EscapePlaceholder string             `json:"escapePlaceholder"`
+	Header            string             `json:"header"`
+	AllowedOrigins    []string           `json:"allowedOrigins"`
 }
 
 func LoadConfig(path string) error {
