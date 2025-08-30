@@ -34,6 +34,7 @@ Sentinel uses a JSON configuration file (default: `settings.json`). The configur
 - Upstream Sentry URL
 - Custom header for project selection
 - Allowed origins for CORS (array of strings)
+- `escapePlaceholder`: a placeholder value you can use in your Sentry configuration (e.g., DSN field). Sentinel will replace every occurrence of this value in incoming envelopes with the actual DSN for the target project before forwarding to Sentry. This allows you to avoid hardcoding DSNs in client configs and centralize routing logic.
 
 See [Example Configuration](#example-configuration) for details.
 
@@ -62,6 +63,7 @@ See [Example Configuration](#example-configuration) for details.
 - Validates the presence of a custom header (e.g., `Sec-Ner` or `x-Sentry-App-Selector`).
 - Looks up the project by header value; rejects if not found.
 - Reads the request body and forwards it to the upstream Sentry envelope endpoint, using the project's credentials.
+- Replaces all occurrences of the configured `escapePlaceholder` value in the request body with the actual DSN for the target project, then forwards the modified envelope to the upstream Sentry endpoint using the project's credentials.
 - Returns 200 on success, propagates Sentry errors otherwise.
 - CORS is configured to allow only the origins specified in `allowedOrigins` from the configuration file.
 
@@ -118,6 +120,7 @@ See [Example Configuration](#example-configuration) for details.
     "route": "/tunnel"
   },
   "sentryUrl": "https://sentry.io",
+  "escapePlaceholder": "https://0@sentry.io/0",
   "header": "x-Sentry-App-Selector",
   "allowedOrigins": [
     "https://example.com",
